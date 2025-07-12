@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="menu-container">
+  <header class="menu-header">
+    <h1>Painel da Clínica</h1>
+    <p>Escolha uma das opções abaixo:</p>
+  </header>
+
+  <div class="menu-grid">
+    <a href="{{ url_for('marcar_consulta') }}" class="menu-card">
+      <h3>Agendar Consulta</h3>
+      <p>Agende uma consulta com um profissional.</p>
+    </a>
+    <a href="{{ url_for('cancelar_consulta') }}" class="menu-card">
+      <h3>Cancelar Consulta</h3>
+      <p>Remova uma consulta agendada.</p>
+    </a>
+    <a href="#" class="menu-card">
+      <h3>Visualizar Médicos</h3>
+      <p>Consulte a lista de profissionais disponíveis.</p>
+    </a>
+    <a href="{{ url_for('consultas_paciente') }}" class="menu-card">
+      <h3>Visualizar Consultas</h3>
+      <p>Acompanhe os agendamentos realizados.</p>
+    </a>
+    <a href="#" class="menu-card">
+      <h3>Realizar Pagamento</h3>
+      <p>Efetue o pagamento de uma consulta.</p>
+    </a>
+  </div>
+
+  <footer class="menu-footer">
+    <a href="{{ url_for('logout') }}">Sair</a>
+  </footer>
+</div>
+{% endblock %}

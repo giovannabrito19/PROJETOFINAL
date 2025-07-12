@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h2>Marcar Consulta</h2>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="alert alert-info">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="{{ url_for('confirmar_consulta') }}">
+    <!-- Nome do Paciente -->
+    <div class="form-group">
+      <label for="paciente">Nome do Paciente:</label>
+      <input type="text" id="paciente" name="paciente" required>
+    </div>
+
+    <!-- Especialidade -->
+    <div class="form-group">
+      <label for="especialidade">Especialidade:</label>
+      <select id="especialidade" name="especialidade" required>
+        <option value="">Selecione uma especialidade</option>
+        {% for esp in especialidades %}
+          <option value="{{ esp }}">{{ esp }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Médico -->
+    <div class="form-group">
+      <label for="medico">Médico:</label>
+      <select id="medico" name="medico" required>
+        <option value="">Selecione um médico</option>
+        {% for medico in medicos %}
+          <option value="{{ medico.nome }}" data-especialidade="{{ medico.especialidade.nome }}">
+            {{ medico.nome }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Data -->
+    <div class="form-group">
+      <label for="data">Data da Consulta:</label>
+      <input type="date" id="data" name="data" required>
+    </div>
+
+    <!-- Horário -->
+    <div class="form-group">
+      <label for="horario">Horário:</label>
+      <select id="horario" name="horario" required>
+        <option value="">Selecione um médico e uma data</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Agendar Consulta</button>
+  </form>
+</div>
+
+<script>
+  // Filtrar médicos pela especialidade selecionada
+  document.getElementById('especialidade').addEventListener('change', function() {
+    const especialidade = this.value;
+    const medicoSelect = document.getElementById('medico');
+    medicoSelect.selectedIndex = 0;
+
+    for (let i = 1; i < medicoSelect.options.length; i++) {
+      const option = medicoSelect.options[i];
+      if (especialidade === "" || option.getAttribute('data-especialidade') === especialidade) {
+        option.style.display = "";
+      } else {
+        option.style.display = "none";
+      }
+    }
+    // Limpa horários ao mudar o médico/especialidade
+    document.getElementById('horario').innerHTML = '<option value="">Selecione um médico e uma data</option>';
+  });
+
+  // Atualizar horários disponíveis conforme médico e data
+  function atualizarHorarios() {
+    const medico = document.getElementById('medico').value;
+    const data = document.getElementById('data').value;
+
+    if (medico && data) {
+      fetch(`/horarios_disponiveis?medico=${encodeURIComponent(medico)}&data=${encodeURIComponent(data)}`)
+        .then(response => response.json())
+        .then(horarios => {
+          const horarioSelect = document.getElementById('horario');
+          horarioSelect.innerHTML = '';
+
+          if (horarios.length === 0) {
+            const option = document.createElement('option');
+            option.value = '';
+            option.text = 'Nenhum horário disponível';
+            horarioSelect.appendChild(option);
+          } else {
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.text = 'Selecione um horário';
+            horarioSelect.appendChild(defaultOption);
+
+            horarios.forEach(horario => {
+              const option = document.createElement('option');
+              option.value = horario;
+              option.text = horario;
+              horarioSelect.appendChild(option);
+            });
+          }
+        });
+    } else {
+      // Se não tem médico ou data selecionados, limpar horários
+      document.getElementById('horario').innerHTML = '<option value="">Selecione um médico e uma data</option>';
+    }
+  }
+
+  document.getElementById('medico').addEventListener('change', atualizarHorarios);
+  document.getElementById('data').addEventListener('change', atualizarHorarios);
+</script>
+
+  <footer class="menu-footer">
+    <a href="{{ url_for('voltar_menup') }}">Voltar para o menu</a>
+  </footer>
+{% endblock %}

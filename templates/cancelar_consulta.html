@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Cancelar Consulta</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class="flashes">
+    {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+{% if consultas_agendadas %}
+  <form action="{{ url_for('cancelar_consulta_post') }}" method="POST">
+    <label for="consulta_id">Selecione a consulta para cancelar:</label>
+    <select name="consulta_id" id="consulta_id" required>
+      <option value="">-- Selecione --</option>
+      {% for consulta in consultas_agendadas %}
+        <option value="{{ loop.index0 }}">
+          {{ consulta.data_hora }} - Dr(a). {{ consulta.medico.nome }}
+        </option>
+      {% endfor %}
+    </select>
+    <br><br>
+    <button type="submit">Cancelar Consulta Selecionada</button>
+  </form>
+{% else %}
+  <p>Você não tem consultas agendadas para cancelar.</p>
+{% endif %}
+
+
+
+<footer class="menu-footer">
+  <a href="{{ url_for('voltar_menup') }}">Voltar para o menu</a>
+</footer>
+
+{% endblock %}

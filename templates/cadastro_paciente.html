@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="background-image: url({{ url_for('static', filename='img/fundo-dna.jpg') }}); background-size: cover; background-position: center; min-height: 100vh;">
+  <div class="login-container">
+    <div class="login-box">
+      <h2>Cadastro de Paciente</h2>
+
+      <form action="{{ url_for('cadastro_paciente') }}" method="POST">
+        <input type="text" name="nome" placeholder="Nome completo" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="cpf" name="cpf" placeholder="CPF" required>
+        <input type="password" name="senha" placeholder="Senha" required>
+
+        <button type="submit">Cadastrar</button>
+      </form>
+
+      <p>Já tem uma conta? <a href="{{ url_for('login') }}">Voltar ao Login</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

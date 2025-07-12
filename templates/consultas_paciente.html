@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Consultas do Paciente: {{ nome }}</h2>
+
+{% if consultas %}
+  <ul>
+    {% for consulta in consultas %}
+      <li>{{ consulta.data_hora }} - Dr(a). {{ consulta.medico.nome }} ({{ consulta.status }})</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Esse paciente não tem consultas marcadas.</p>
+{% endif %}
+
+
+
+  <footer class="menu-footer">
+    <a href="{{ url_for('voltar_menup') }}">Voltar para o menu</a>
+  </footer>
+  
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Lista de Médicos por Especialidade</h2>
+
+    {% if especialidades %}
+        {% for esp in especialidades %}
+            <h3>{{ esp.nome }}</h3>
+            {% if esp.medicos %}
+                <ul>
+                    {% for medico in esp.medicos %}
+                        <li>Dr(a). {{ medico.nome }} (CRM: {{ medico.crm }})</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p><em>Nenhum médico cadastrado nessa especialidade.</em></p>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <p>Nenhuma especialidade cadastrada.</p>
+    {% endif %}
+{% endblock %}

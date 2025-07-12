@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Consultas do Médico: Dr(a). {{ nome }}</h2>
+
+{% if consultas %}
+  <ul>
+    {% for consulta in consultas %}
+      <li>{{ consulta.data_hora }} - Paciente: {{ consulta.paciente.nome }} ({{ consulta.status }})</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Esse médico não tem consultas agendadas.</p>
+{% endif %}
+
+<a href="{{ url_for('marcar_consulta') }}">Voltar</a>
+{% endblock %}
