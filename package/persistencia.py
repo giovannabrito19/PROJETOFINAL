@@ -110,6 +110,31 @@ def carregar_usuarios():
     with open('usuarios.json', 'r') as f:
         return [Usuario.from_dict(u) for u in json.load(f)]
 
+def salvar_pagamento(pagamento):
+    try:
+        with open("pagamentos.json", "r", encoding="utf-8") as f:
+            pagamentos = json.load(f)
+    except FileNotFoundError:
+        pagamentos = []
+
+    # Criação do dicionário para salvar no JSON
+    pagamento_dict = {
+        "valor": pagamento.valor,
+        "data": pagamento.data,
+        "consulta": {
+            "paciente": pagamento.consulta.paciente.nome,
+            "medico": pagamento.consulta.medico.nome,
+            "data_hora": pagamento.consulta.data_hora
+        },
+        "forma": pagamento.__class__.__name__,  # Cartao ou Pix
+        "dados": getattr(pagamento, "numero_cartao", getattr(pagamento, "chave_pix", None))
+    }
+
+    pagamentos.append(pagamento_dict)
+
+    with open("pagamentos.json", "w", encoding="utf-8") as f:
+        json.dump(pagamentos, f, indent=4, ensure_ascii=False)
+
 
 #Carregamento inicial dos dados
 pacientes = carregar_pacientes(consultas=[])

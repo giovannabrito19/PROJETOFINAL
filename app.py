@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from package.models import Paciente, Medico, Consulta, Especialidade, Cartao, Dinheiro, Pix
 from package.persistencia import (
     salvar_pacientes, salvar_medicos, salvar_especialidades, salvar_consultas,
-    carregar_dados, carregar_consultas, carregar_especialidades, carregar_medicos, carregar_pacientes
+    carregar_dados, carregar_consultas, carregar_especialidades, carregar_medicos, carregar_pacientes, salvar_pagamento
 )
 from package.utilitarios import encontrar_paciente, encontrar_medico
 
@@ -336,9 +336,80 @@ def cancelar_consulta_post():
 
     return redirect(url_for('cancelar_consulta'))
 
-@app.route("/medicos")
-def listar_medicos():
-    return render_template("visualizar_medicos.html", medicos=medicos)
+def carregar_medicos():
+    try:
+        with open("medicos.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+@app.route("/visualizar_medicos", methods=["GET", "POST"])
+def visualizar_medicos():
+    medicos = carregar_medicos()
+
+    # Obter todas as especialidades únicas
+    especialidades = sorted(set(m['especialidade']['nome'] for m in medicos))  # ✅ certo
+
+
+    especialidade_selecionada = request.form.get("especialidade")
+    if especialidade_selecionada:
+        medicos_filtrados = [m for m in medicos if m['especialidade']['nome'] == especialidade_selecionada]
+
+    else:
+        medicos_filtrados = []
+
+    return render_template("visualizar_medicos.html",
+                           especialidades=especialidades,
+                           medicos=medicos_filtrados,
+                           selecionada=especialidade_selecionada)
+
+
+@app.route("/pagamento", methods=["GET", "POST"])
+def pagamento():
+    if 'email' not in session or session.get('tipo') != 'paciente':
+        return redirect(url_for('login'))
+
+    # Pega o paciente pelo e-mail da sessão
+    paciente = next((p for p in pacientes if p.email == session['email']), None)
+
+    if not paciente:
+        flash("Paciente não encontrado.")
+        return redirect(url_for('menu_paciente'))
+
+    # Filtra consultas do paciente logado
+    consultas_paciente = [c for c in consultas if c.paciente.email == paciente.email and c.status == "Agendada"]
+
+    if request.method == "POST":
+        consulta_index = int(request.form["consulta"])
+        forma_pagamento = request.form["forma"]
+        data_pagamento = datetime.now().strftime("%d/%m/%Y")
+
+        if 0 <= consulta_index < len(consultas_paciente):
+            consulta_escolhida = consultas_paciente[consulta_index]
+            valor = 200.0
+
+            if forma_pagamento == "cartao":
+                numero_cartao = request.form["numero_cartao"]
+                pagamento = Cartao(valor, data_pagamento, consulta_escolhida, numero_cartao)
+            elif forma_pagamento == "pix":
+                chave_pix = request.form["chave_pix"]
+                pagamento = Pix(valor, data_pagamento, consulta_escolhida, chave_pix)
+            else:
+                flash("Forma de pagamento inválida.")
+                return redirect(url_for("pagamento"))
+
+            pagamento.processar_pagamento()
+            salvar_pagamento(pagamento)
+            consulta_escolhida.status = "Paga"
+            salvar_consultas(consultas)
+            flash("Pagamento realizado com sucesso!", "success")
+            return render_template("pagamento_confirmado.html", pagamento=pagamento)
+        else:
+            flash("Consulta selecionada inválida.", "error")
+            return redirect(url_for("pagamento"))
+
+    return render_template("pagamento.html", consultas=consultas_paciente)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

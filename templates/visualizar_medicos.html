@@ -1,21 +1,37 @@
 {% extends "base.html" %}
-{% block content %}
-    <h2>Lista de Médicos por Especialidade</h2>
 
-    {% if especialidades %}
-        {% for esp in especialidades %}
-            <h3>{{ esp.nome }}</h3>
-            {% if esp.medicos %}
-                <ul>
-                    {% for medico in esp.medicos %}
-                        <li>Dr(a). {{ medico.nome }} (CRM: {{ medico.crm }})</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p><em>Nenhum médico cadastrado nessa especialidade.</em></p>
-            {% endif %}
-        {% endfor %}
-    {% else %}
-        <p>Nenhuma especialidade cadastrada.</p>
+{% block content %}
+<div class="container">
+    <h2>Visualizar Médicos</h2>
+
+    <form method="POST">
+        <label for="especialidade">Escolha a especialidade:</label>
+        <select name="especialidade" id="especialidade" required>
+            <option value="" disabled selected>-- Selecione --</option>
+            {% for esp in especialidades %}
+                <option value="{{ esp }}" {% if selecionada == esp %}selected{% endif %}>{{ esp }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Ver Médicos</button>
+    </form>
+
+    {% if medicos %}
+        <h3>Médicos de {{ selecionada }}</h3>
+        <ul>
+            {% for medico in medicos %}
+                <li>
+                    <strong>{{ medico.nome }}</strong> (CRM: {{ medico.crm }})<br>
+                    Email: {{ medico.email }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% elif selecionada %}
+        <p>Não há médicos cadastrados para esta especialidade.</p>
     {% endif %}
+</div>
+
+<footer class="menu-footer">
+  <a href="{{ url_for('voltar_menup') }}">Voltar para o menu</a>
+</footer>
+
 {% endblock %}

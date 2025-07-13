@@ -1,0 +1,46 @@
+[
+    {
+        "valor": 200.0,
+        "data": "12/07/2025",
+        "consulta": {
+            "paciente": "Carol",
+            "medico": "Luisa",
+            "data_hora": "2025-07-18 10:00"
+        },
+        "forma": "Cartao",
+        "dados": ""
+    },
+    {
+        "valor": 200.0,
+        "data": "12/07/2025",
+        "consulta": {
+            "paciente": "Carol",
+            "medico": "Luisa",
+            "data_hora": "2025-07-18 10:00"
+        },
+        "forma": "Cartao",
+        "dados": "123456789"
+    },
+    {
+        "valor": 200.0,
+        "data": "13/07/2025",
+        "consulta": {
+            "paciente": "Carol",
+            "medico": "Joao",
+            "data_hora": "2025-07-15 14:00"
+        },
+        "forma": "Pix",
+        "dados": "205689741"
+    },
+    {
+        "valor": 200.0,
+        "data": "13/07/2025",
+        "consulta": {
+            "paciente": "Carol",
+            "medico": "Luisa",
+            "data_hora": "2025-07-22 12:00"
+        },
+        "forma": "Cartao",
+        "dados": "147852369"
+    }
+]

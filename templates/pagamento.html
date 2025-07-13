@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Pagamento</h2>
+<form method="POST">
+  <label for="consulta">Selecione uma consulta:</label>
+  <select name="consulta" required>
+    <option value="" disabled selected>-- Selecione --</option>
+    {% for c in consultas %}
+      <option value="{{ loop.index0 }}">
+        {{ c.data_hora }} - Dr(a). {{ c.medico.nome }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <p><strong>Valor: R$ 200,00</strong></p>
+
+  <label>Forma de pagamento:</label><br>
+  <input type="radio" name="forma" value="cartao" required onclick="mostrarCartao()"> Cartão<br>
+  <input type="radio" name="forma" value="pix" onclick="mostrarPix()"> Pix<br><br>
+
+  <div id="cartao" style="display:none;">
+    <label for="numero_cartao">Número do Cartão:</label>
+    <input type="text" name="numero_cartao">
+  </div>
+
+  <div id="pix" style="display:none;">
+    <label for="chave_pix">Chave Pix:</label>
+    <input type="text" name="chave_pix">
+  </div>
+
+  <br>
+  <button type="submit">Pagar</button>
+</form>
+
+<script>
+function mostrarCartao() {
+  document.getElementById("cartao").style.display = "block";
+  document.getElementById("pix").style.display = "none";
+  document.querySelector("input[name='numero_cartao']").required = true;
+  document.querySelector("input[name='chave_pix']").required = false;
+}
+
+function mostrarPix() {
+  document.getElementById("cartao").style.display = "none";
+  document.getElementById("pix").style.display = "block";
+  document.querySelector("input[name='numero_cartao']").required = false;
+  document.querySelector("input[name='chave_pix']").required = true;
+}
+</script>
+
+<footer class="menu-footer">
+  <a href="{{ url_for('voltar_menup') }}">Voltar para o menu</a>
+</footer>
+
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Pagamento realizado com sucesso!</h2>
+<p>Valor: R$ {{ pagamento.valor }}</p>
+<p>Data: {{ pagamento.data }}</p>
+<p>Médico: {{ pagamento.consulta.medico.nome }}</p>
+<p>Forma de pagamento: {{ pagamento.__class__.__name__ }}</p>
+<a href="{{ url_for('menu_paciente') }}">Voltar ao menu</a>
+{% endblock %}
