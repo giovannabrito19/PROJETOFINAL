@@ -1,0 +1,161 @@
+/* === Estilo Geral === */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to bottom, #f0f4ff, #e8ecf9);
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+h1, h2, h3 {
+    color: #2b3d77;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #ffffffcc;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* === Botões === */
+button, .btn {
+    background-color: #5a72e5;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover, .btn:hover {
+    background-color: #3f51b5;
+}
+
+/* === Campos de formulário === */
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    box-sizing: border-box;
+}
+
+/* === Cards === */
+.card {
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 10px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.card h3 {
+    margin-top: 0;
+    color: #5a72e5;
+}
+
+/* === Títulos de seção === */
+.section-title {
+    font-size: 24px;
+    font-weight: bold;
+    border-left: 5px solid #5a72e5;
+    padding-left: 10px;
+    margin-bottom: 20px;
+}
+
+/* === Container sucesso === */
+.sucesso-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.sucesso-titulo {
+    color: #2e5db7;
+    margin-bottom: 20px;
+}
+
+.sucesso-detalhes p {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.btn-secondary {
+    background-color: #4b6cb7;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #3c59a5;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.menu-footer {
+    margin-top: 90px; /* Aumenta a margem superior para empurrar o botão para baixo */
+    text-align: center; /* Centraliza o botão dentro do footer */
+}
+
+/* Container para os botões de opção */
+.pagamento-opcoes-botoes {
+    display: flex;
+    gap: 12px; /* Espaço entre os botões */
+    margin-bottom: 20px; /* Adiciona espaço abaixo dos botões */
+    margin-top: 40px; 
+}
+
+/* Estilo padrão dos botões */
+.btn-opcao {
+    flex: 1; /* Faz com que os botões tenham o mesmo tamanho */
+    padding: 15px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+/* Estilo quando o mouse passa por cima */
+.btn-opcao:hover {
+    background-color: #e0e0e0;
+}
+
+/* Estilo para o botão selecionado (ativo) */
+.btn-opcao.ativo {
+    background-color: #4CAF50; /* Uma cor para indicar que foi selecionado */
+    color: white;
+    border-color: #4CAF50;
+    transform: translateY(-2px); /* Pequeno efeito visual ao ser clicado */
+}
+
+/* Estilo para as caixas de formulário adicionais */
+.pagamento-extra {
+    display: flex; /* Define o layout como flexível */
+    flex-direction: column; /* Organiza os itens em coluna */
+    gap: 8px; /* Adiciona espaço entre os elementos (label e input) */
+    margin-bottom: 20px; /* Espaço antes do botão de pagar */
+}

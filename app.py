@@ -219,15 +219,20 @@ def consultas_paciente():
     consultas_pac = [c for c in consultas if c.paciente.nome == paciente.nome]
     return render_template('consultas_paciente.html', consultas=consultas_pac, nome=paciente.nome)
 
-@app.route('/consultas_medico/<nome>')
-def consultas_medico(nome):
-    medico = encontrar_medico(nome, medicos)
+@app.route('/consultas_medico')
+def consultas_medico():
+    if 'email' not in session or session.get('tipo') != 'medico':
+        return redirect(url_for('menu_medico'))
+    
+    medico = next((m for m in medicos if m.email == session['email']), None)
     if not medico:
         flash("Médico não encontrado.")
-        return redirect(url_for('marcar_consulta'))
-
-    consultas_med = [c for c in consultas if c.medico.nome == medico.nome]
+        return redirect(url_for('menu_medico'))
+    
+    # Filtra as consultas para o médico logado
+    consultas_med = [c for c in consultas if c.medico and c.medico.email == medico.email]
     return render_template('consultas_medico.html', consultas=consultas_med, nome=medico.nome)
+
 
 @app.route('/horarios_disponiveis')
 def horarios_disponiveis():
@@ -276,7 +281,7 @@ def cancelar_consulta():
 
     consultas_agendadas = [
         c for c in consultas
-        if c.paciente and c.paciente.email == paciente_logado.email and c.status == "Agendada"
+        if c.paciente and c.paciente.email == paciente_logado.email and (c.status == "Agendada" or c.status == "Paga")
     ]
     
     return render_template('cancelar_consulta.html', consultas_agendadas=consultas_agendadas)
@@ -307,7 +312,7 @@ def cancelar_consulta_post():
     # Re-filtrar as consultas agendadas para o paciente para garantir que o índice é correto
     consultas_do_paciente = [
         c for c in consultas
-        if c.paciente and c.paciente.email == paciente_logado.email and c.status == "Agendada"
+        if c.paciente and c.paciente.email == paciente_logado.email and (c.status == "Agendada" or c.status == "Paga")
     ]
 
     # ESTE É O BLOCO DE LÓGICA QUE DEVE EXISTIR APENAS UMA VEZ
@@ -322,7 +327,7 @@ def cancelar_consulta_post():
             if (c.data_hora == consulta_para_cancelar.data_hora and
                 c.medico.nome == consulta_para_cancelar.medico.nome and
                 c.paciente.nome == consulta_para_cancelar.paciente.nome and
-                c.status == "Agendada"): # Importante: apenas cancelar se ainda estiver agendada
+                (c.status == "Agendada" or c.status == "Paga")): 
                 
                 # Chamando o seu método 'cancelar_consulta'
                 consultas[i].cancelar_consulta() 
@@ -335,13 +340,6 @@ def cancelar_consulta_post():
         flash("Seleção de consulta inválida ou consulta não encontrada.", "error")
 
     return redirect(url_for('cancelar_consulta'))
-
-def carregar_medicos():
-    try:
-        with open("medicos.json", "r", encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return []
 
 @app.route("/visualizar_medicos", methods=["GET", "POST"])
 def visualizar_medicos():
@@ -381,7 +379,7 @@ def pagamento():
 
     if request.method == "POST":
         consulta_index = int(request.form["consulta"])
-        forma_pagamento = request.form["forma"]
+        forma_pagamento = request.form["forma_pagamento"]
         data_pagamento = datetime.now().strftime("%d/%m/%Y")
 
         if 0 <= consulta_index < len(consultas_paciente):
@@ -409,6 +407,79 @@ def pagamento():
             return redirect(url_for("pagamento"))
 
     return render_template("pagamento.html", consultas=consultas_paciente)
+
+@app.route('/cancelar_consultamed', methods=['GET'])
+def cancelar_medconsulta():
+    if 'email' not in session or session.get('tipo') != 'medico':
+        return redirect(url_for('login'))
+
+    medico_logado = next((m for m in medicos if m.email == session['email']), None)
+    
+    if not medico_logado:
+        flash("Médico não encontrado.", "error")
+        return redirect(url_for('login'))
+
+    consultas_do_medico = [
+        c for c in consultas
+        if c.medico and c.medico.email == medico_logado.email and c.status in ["Agendada", "Paga"]
+    ]
+
+    return render_template("cancelar_consultamed.html", consultas_agendadas=consultas_do_medico)
+
+
+@app.route('/cancelar_consultamed_post', methods=['POST'])
+def cancelar_medconsulta_post():
+    if 'email' not in session or session.get('tipo') != 'medico':
+        return redirect(url_for('login'))
+
+    medico_logado = next((p for p in medicos if p.email == session['email']), None)
+    if not medico_logado:
+        flash("Médico não encontrado.", "error")
+        return redirect(url_for('menu_medico'))
+
+    consulta_index = request.form.get('consulta_id')
+    
+    if not consulta_index:
+        flash("Por favor, selecione uma consulta para cancelar.", "warning")
+        return redirect(url_for('cancelar_consultamed'))
+
+    try:
+        consulta_index = int(consulta_index)
+    except ValueError:
+        flash("Seleção de consulta inválida.", "error")
+        return redirect(url_for('cancelar_consultamed'))
+
+    # Re-filtrar as consultas agendadas para o paciente para garantir que o índice é correto
+    consultas_do_medico = [
+        c for c in consultas
+        if c.medico and c.medico.email == medico_logado.email and (c.status == "Agendada" or c.status == "Paga")
+    ]
+
+    # ESTE É O BLOCO DE LÓGICA QUE DEVE EXISTIR APENAS UMA VEZ
+    if 0 <= consulta_index < len(consultas_do_medico):
+        consulta_para_cancelar = consultas_do_medico[consulta_index]
+        
+        # Encontre a consulta original na lista global 'consultas'
+        for i, c in enumerate(consultas):
+            # Cuidado com a comparação de objetos. É melhor comparar IDs ou atributos únicos.
+            # Se 'Consulta' tiver um ID único, use-o. Senão, compare data/hora/medico/paciente.
+            # Usando atributos para comparação, já que não temos ID único no modelo atual.
+            if (c.data_hora == consulta_para_cancelar.data_hora and
+                c.medico.nome == consulta_para_cancelar.medico.nome and
+                c.paciente.nome == consulta_para_cancelar.paciente.nome and
+                (c.status == "Agendada" or c.status == "Paga")): 
+                
+                # Chamando o seu método 'cancelar_consulta'
+                consultas[i].cancelar_consulta() 
+                salvar_consultas(consultas) # Salva as alterações no banco de dados
+                flash("Consulta cancelada com sucesso!", "success")
+                break
+        else:
+            flash("Erro: Consulta não encontrada ou já cancelada na base de dados.", "error")
+    else:
+        flash("Seleção de consulta inválida ou consulta não encontrada.", "error")
+
+    return redirect(url_for('cancelar_consultamed'))
 
 
 if __name__ == '__main__':

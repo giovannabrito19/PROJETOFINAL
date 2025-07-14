@@ -1,56 +1,81 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>Pagamento</h2>
-<form method="POST">
-  <label for="consulta">Selecione uma consulta:</label>
-  <select name="consulta" required>
-    <option value="" disabled selected>-- Selecione --</option>
-    {% for c in consultas %}
-      <option value="{{ loop.index0 }}">
-        {{ c.data_hora }} - Dr(a). {{ c.medico.nome }}
-      </option>
-    {% endfor %}
-  </select>
+<div class="pagamento-container">
+  <h2 class="section-title">💳 Pagamento</h2>
 
-  <p><strong>Valor: R$ 200,00</strong></p>
+  <form method="POST" class="pagamento-form">
+    <label for="consulta">Selecione uma consulta:</label>
+    <select name="consulta" required>
+      <option value="" disabled selected>-- Selecione --</option>
+      {% for c in consultas %}
+        <option value="{{ loop.index0 }}">{{ c.data_hora }} - Dr(a). {{ c.medico.nome }}</option>
+      {% endfor %}
+    </select>
 
-  <label>Forma de pagamento:</label><br>
-  <input type="radio" name="forma" value="cartao" required onclick="mostrarCartao()"> Cartão<br>
-  <input type="radio" name="forma" value="pix" onclick="mostrarPix()"> Pix<br><br>
+    <p class="valor">💰 <strong>Valor: R$ 200,00</strong></p>
 
-  <div id="cartao" style="display:none;">
-    <label for="numero_cartao">Número do Cartão:</label>
-    <input type="text" name="numero_cartao">
-  </div>
+    <label>Forma de pagamento:</label>
+    
+    <div class="pagamento-opcoes-botoes">
+      <button type="button" class="btn-opcao" data-forma="cartao">Cartão de Crédito</button>
+      <button type="button" class="btn-opcao" data-forma="pix">Pix</button>
+    </div>
 
-  <div id="pix" style="display:none;">
-    <label for="chave_pix">Chave Pix:</label>
-    <input type="text" name="chave_pix">
-  </div>
+    <input type="hidden" name="forma_pagamento" id="forma_pagamento_input" required>
 
-  <br>
-  <button type="submit">Pagar</button>
-</form>
+    <div id="cartao" class="pagamento-extra" style="display:none;">
+      <label for="numero_cartao">Número do Cartão:</label>
+      <input type="text" name="numero_cartao" placeholder="**** **** **** ****">
+    </div>
+
+    <div id="pix" class="pagamento-extra" style="display:none;">
+      <label for="chave_pix">Chave Pix:</label>
+      <input type="text" name="chave_pix" placeholder="Insira sua chave Pix">
+    </div>
+    
+    <button type="submit" class="btn btn-pagar">Pagar</button>
+  </form>
+</div>
 
 <script>
-function mostrarCartao() {
-  document.getElementById("cartao").style.display = "block";
-  document.getElementById("pix").style.display = "none";
-  document.querySelector("input[name='numero_cartao']").required = true;
-  document.querySelector("input[name='chave_pix']").required = false;
-}
+    // Vamos reescrever as funções para trabalhar com os botões
+    const botoesOpcao = document.querySelectorAll('.btn-opcao');
+    const formaPagamentoInput = document.getElementById('forma_pagamento_input');
+    const cartaoDiv = document.getElementById('cartao');
+    const pixDiv = document.getElementById('pix');
+    const numeroCartaoInput = document.querySelector("#cartao input[name='numero_cartao']");
+    const chavePixInput = document.querySelector("#pix input[name='chave_pix']");
 
-function mostrarPix() {
-  document.getElementById("cartao").style.display = "none";
-  document.getElementById("pix").style.display = "block";
-  document.querySelector("input[name='numero_cartao']").required = false;
-  document.querySelector("input[name='chave_pix']").required = true;
-}
+    botoesOpcao.forEach(botao => {
+        botao.addEventListener('click', () => {
+            // 1. Atualiza o valor do campo oculto para ser enviado ao servidor
+            const forma = botao.dataset.forma;
+            formaPagamentoInput.value = forma;
+
+            // 2. Remove a classe 'ativo' de todos os botões e adiciona no botão clicado
+            botoesOpcao.forEach(b => b.classList.remove('ativo'));
+            botao.classList.add('ativo');
+
+            // 3. Esconde todas as divs de pagamento extra e remove a validação
+            cartaoDiv.style.display = 'none';
+            pixDiv.style.display = 'none';
+            numeroCartaoInput.required = false;
+            chavePixInput.required = false;
+
+            // 4. Mostra a div correta e adiciona validação ao input
+            if (forma === 'cartao') {
+                cartaoDiv.style.display = 'flex';
+                numeroCartaoInput.required = true;
+            } else if (forma === 'pix') {
+                pixDiv.style.display = 'flex';
+                chavePixInput.required = true;
+            }
+        });
+    });
 </script>
-
 <footer class="menu-footer">
-  <a href="{{ url_for('voltar_menup') }}">Voltar para o menu</a>
-</footer>
+    <a href="{{ url_for('voltar_menup') }}" class="btn">Voltar para o menu</a>
+  </footer>
 
 {% endblock %}

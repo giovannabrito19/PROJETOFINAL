@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-  <h2>Marcar Consulta</h2>
+  <h2 class="section-title">Marcar Consulta</h2>
 
   {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -15,56 +15,50 @@
 
   <form method="POST" action="{{ url_for('confirmar_consulta') }}">
     <!-- Nome do Paciente -->
-    <div class="form-group">
-      <label for="paciente">Nome do Paciente:</label>
-      <input type="text" id="paciente" name="paciente" required>
-    </div>
+    <label for="paciente">Nome do Paciente:</label>
+    <input type="text" id="paciente" name="paciente" required>
 
     <!-- Especialidade -->
-    <div class="form-group">
-      <label for="especialidade">Especialidade:</label>
-      <select id="especialidade" name="especialidade" required>
-        <option value="">Selecione uma especialidade</option>
-        {% for esp in especialidades %}
-          <option value="{{ esp }}">{{ esp }}</option>
-        {% endfor %}
-      </select>
-    </div>
+    <label for="especialidade">Especialidade:</label>
+    <select id="especialidade" name="especialidade" required>
+      <option value="">Selecione uma especialidade</option>
+      {% for esp in especialidades %}
+        <option value="{{ esp }}">{{ esp }}</option>
+      {% endfor %}
+    </select>
 
     <!-- Médico -->
-    <div class="form-group">
-      <label for="medico">Médico:</label>
-      <select id="medico" name="medico" required>
-        <option value="">Selecione um médico</option>
-        {% for medico in medicos %}
-          <option value="{{ medico.nome }}" data-especialidade="{{ medico.especialidade.nome }}">
-            {{ medico.nome }}
-          </option>
-        {% endfor %}
-      </select>
-    </div>
+    <label for="medico">Médico:</label>
+    <select id="medico" name="medico" required>
+      <option value="">Selecione um médico</option>
+      {% for medico in medicos %}
+        <option value="{{ medico.nome }}" data-especialidade="{{ medico.especialidade.nome }}">
+          {{ medico.nome }}
+        </option>
+      {% endfor %}
+    </select>
 
     <!-- Data -->
-    <div class="form-group">
-      <label for="data">Data da Consulta:</label>
-      <input type="date" id="data" name="data" required>
-    </div>
+    <label for="data">Data da Consulta:</label>
+    <input type="date" id="data" name="data" required>
 
     <!-- Horário -->
-    <div class="form-group">
-      <label for="horario">Horário:</label>
-      <select id="horario" name="horario" required>
-        <option value="">Selecione um médico e uma data</option>
-      </select>
-    </div>
+    <label for="horario">Horário:</label>
+    <select id="horario" name="horario" required>
+      <option value="">Selecione um médico e uma data</option>
+    </select>
 
-    <button type="submit" class="btn btn-primary">Agendar Consulta</button>
+    <button type="submit" class="btn">Agendar Consulta</button>
   </form>
+
+  <footer class="menu-footer" style="margin-top: 20px;">
+    <a href="{{ url_for('voltar_menup') }}" class="btn">Voltar para o menu</a>
+  </footer>
 </div>
 
 <script>
   // Filtrar médicos pela especialidade selecionada
-  document.getElementById('especialidade').addEventListener('change', function() {
+  document.getElementById('especialidade').addEventListener('change', function () {
     const especialidade = this.value;
     const medicoSelect = document.getElementById('medico');
     medicoSelect.selectedIndex = 0;
@@ -77,7 +71,6 @@
         option.style.display = "none";
       }
     }
-    // Limpa horários ao mudar o médico/especialidade
     document.getElementById('horario').innerHTML = '<option value="">Selecione um médico e uma data</option>';
   });
 
@@ -113,7 +106,6 @@
           }
         });
     } else {
-      // Se não tem médico ou data selecionados, limpar horários
       document.getElementById('horario').innerHTML = '<option value="">Selecione um médico e uma data</option>';
     }
   }
@@ -121,8 +113,5 @@
   document.getElementById('medico').addEventListener('change', atualizarHorarios);
   document.getElementById('data').addEventListener('change', atualizarHorarios);
 </script>
-
-  <footer class="menu-footer">
-    <a href="{{ url_for('voltar_menup') }}">Voltar para o menu</a>
-  </footer>
 {% endblock %}
+

@@ -1,21 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Consultas do Paciente: {{ nome }}</h2>
+<div class="container">
+  <h2 class="section-title">Minhas Consultas — {{ nome }}</h2>
 
-{% if consultas %}
-  <ul>
-    {% for consulta in consultas %}
-      <li>{{ consulta.data_hora }} - Dr(a). {{ consulta.medico.nome }} ({{ consulta.status }})</li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>Esse paciente não tem consultas marcadas.</p>
-{% endif %}
+  {% if consultas %}
+    <div class="consultas-lista">
+      {% for consulta in consultas %}
+        <div class="card">
+          <h3>{{ consulta.data_hora }}</h3>
+          <p><strong>Médico:</strong> Dr(a). {{ consulta.medico.nome }}</p>
+          <p><strong>Status:</strong> {{ consulta.status }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="no-consultas-msg">Você não tem consultas marcadas.</p>
+  {% endif %}
 
-
-
-  <footer class="menu-footer">
-    <a href="{{ url_for('voltar_menup') }}">Voltar para o menu</a>
+  <footer class="menu-footer" style="margin-top: 20px;">
+    <a href="{{ url_for('voltar_menup') }}" class="btn">Voltar para o menu</a>
   </footer>
-  
+</div>
 {% endblock %}

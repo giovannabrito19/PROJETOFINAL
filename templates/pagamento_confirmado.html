@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Pagamento realizado com sucesso!</h2>
-<p>Valor: R$ {{ pagamento.valor }}</p>
-<p>Data: {{ pagamento.data }}</p>
-<p>Médico: {{ pagamento.consulta.medico.nome }}</p>
-<p>Forma de pagamento: {{ pagamento.__class__.__name__ }}</p>
-<a href="{{ url_for('menu_paciente') }}">Voltar ao menu</a>
+
+<div class="sucesso-container">
+  <h2 class="section-title sucesso-titulo">✅ Pagamento realizado com sucesso!</h2>
+
+  <div class="sucesso-detalhes">
+    <p><strong>Valor:</strong> R$ {{ pagamento.valor }}</p>
+    <p><strong>Data:</strong> {{ pagamento.data }}</p>
+    <p><strong>Médico:</strong> Dr(a). {{ pagamento.consulta.medico.nome }}</p>
+    <p><strong>Forma de pagamento:</strong> {{ pagamento.__class__.__name__ }}</p>
+  </div>
+
+  <a href="{{ url_for('menu_paciente') }}" class="btn btn-secondary">Voltar ao menu</a>
+</div>
+
 {% endblock %}

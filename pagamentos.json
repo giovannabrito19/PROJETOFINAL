@@ -42,5 +42,16 @@
         },
         "forma": "Cartao",
         "dados": "147852369"
+    },
+    {
+        "valor": 200.0,
+        "data": "13/07/2025",
+        "consulta": {
+            "paciente": "Carol",
+            "medico": "Luisa",
+            "data_hora": "2025-07-24 12:00"
+        },
+        "forma": "Cartao",
+        "dados": "000 000 00 0000"
     }
 ]

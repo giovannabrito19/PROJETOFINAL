@@ -12,5 +12,8 @@
   <p>Esse médico não tem consultas agendadas.</p>
 {% endif %}
 
-<a href="{{ url_for('marcar_consulta') }}">Voltar</a>
+<footer class="menu-footer" style="margin-top: 20px;">
+    <a href="{{ url_for('voltar_menum') }}" class="btn">Voltar para o menu</a>
+  </footer>
+
 {% endblock %}
