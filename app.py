@@ -497,5 +497,128 @@ def visualizar_pacientes():
     return render_template('visualizar_pacientes.html', consultas=consultas_med, nome=medico.nome)
 
 
+@app.route("/editar_perfil_paciente", methods=["GET", "POST"])
+def editar_perfil_paciente():
+    if 'email' not in session or session.get('tipo') != 'paciente':
+        flash("Acesso não autorizado.", "error")
+        return redirect(url_for('login'))
+
+    paciente = next((m for m in pacientes if m.email == session['email']), None)
+
+    if not paciente:
+        return "Paciente não encontrado.", 404
+
+    if request.method == "POST":
+        campo = request.form.get("campo")
+        valor = request.form.get("valor")
+
+         # Atualiza pacientes normalmente
+        if campo == "nome":
+            paciente.nome = valor
+        elif campo == "cpf":
+            paciente.cpf = valor
+        elif campo == "email":
+            # Verifica se já existe outro paciente com esse e-mail
+            if any(p.email.lower() == valor.lower() for p in pacientes if p != paciente):
+                flash("Este e-mail já está em uso por outro paciente.", "error")
+                return redirect(url_for("editar_perfil_paciente"))
+
+            # Atualiza no objeto paciente
+            email_antigo = paciente.email
+            paciente.email = valor
+            session['email'] = valor  # Atualiza na sessão também
+
+            # Atualiza no banco de usuários
+            try:
+                with open(CAMINHO_BANCO, 'r', encoding='utf-8') as f:
+                    usuarios = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError):
+                usuarios = []
+
+            for usuario in usuarios:
+                if usuario['email'] == email_antigo:
+                    usuario['email'] = valor
+                    break
+
+            with open(CAMINHO_BANCO, 'w', encoding='utf-8') as f:
+                json.dump(usuarios, f, indent=4)
+
+        salvar_pacientes(pacientes)
+        flash("Dados atualizados com sucesso!", "success")
+        return redirect(url_for("editar_perfil_paciente"))
+
+    return render_template("editar_paciente.html", paciente=paciente)
+
+
+
+
+@app.route("/editar_perfil_medico", methods=["GET", "POST"])
+def editar_perfil_medico():
+    if 'email' not in session or session.get('tipo') != 'medico':
+        flash("Acesso não autorizado.", "error")
+        return redirect(url_for('login'))
+
+    medico = next((m for m in medicos if m.email == session['email']), None)
+
+    if not medico:
+        return "Médico não encontrado.", 404
+
+    if request.method == "POST":
+        campo = request.form.get("campo")
+        valor = request.form.get("valor")
+
+        if campo == "nome":
+            medico.nome = valor
+        elif campo == "crm":
+            medico.crm = valor
+        elif campo == "email":
+            # Verifica se já existe outro médico com o novo e-mail
+            if any(m.email.lower() == valor.lower() for m in medicos if m != medico):
+                flash("Este e-mail já está em uso por outro médico.", "error")
+                return redirect(url_for("editar_perfil_medico"))
+
+            email_antigo = medico.email
+            medico.email = valor
+            session['email'] = valor  # Atualiza na sessão também
+
+            # Atualiza no banco de usuários
+            try:
+                with open(CAMINHO_BANCO, 'r', encoding='utf-8') as f:
+                    usuarios = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError):
+                usuarios = []
+
+            for usuario in usuarios:
+                if usuario['email'] == email_antigo:
+                    usuario['email'] = valor
+                    break
+
+            with open(CAMINHO_BANCO, 'w', encoding='utf-8') as f:
+                json.dump(usuarios, f, indent=4)
+
+        elif campo == "especialidade":
+            especialidade_antiga = medico.especialidade
+            nome_nova = valor.strip()
+
+            existente = next((e for e in especialidades if e.nome.lower() == nome_nova.lower()), None)
+            if existente:
+                medico.especialidade = existente
+            else:
+                nova = Especialidade(nome_nova)
+                especialidades.append(nova)
+                medico.especialidade = nova
+
+            ainda_usada = any(m.especialidade.nome == especialidade_antiga.nome for m in medicos if m != medico)
+            if not ainda_usada:
+                especialidades.remove(especialidade_antiga)
+
+        salvar_medicos(medicos)
+        salvar_especialidades(especialidades)
+
+        flash("Dados atualizados com sucesso!", "success")
+        return redirect(url_for("editar_perfil_medico"))
+
+    return render_template("editar_medico.html", medico=medico)
+
 if __name__ == '__main__':
     app.run(debug=True)

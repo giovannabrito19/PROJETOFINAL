@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Editar Perfil - Paciente</h2>
+
+<!-- MENSAGENS FLASH -->
+{% with mensagens = get_flashed_messages(with_categories=true) %}
+  {% if mensagens %}
+    <ul class="flash-mensagens">
+      {% for categoria, mensagem in mensagens %}
+        <li class="flash {{ categoria }}">{{ mensagem }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<!-- DADOS E FORMULÁRIO -->
+<p><strong>Nome:</strong> {{ paciente.nome }}</p>
+<p><strong>CPF:</strong> {{ paciente.cpf }}</p>
+<p><strong>Email:</strong> {{ paciente.email }}</p>
+
+<form method="post">
+    <label for="campo">Campo a editar:</label><br>
+    <select name="campo" id="campo" required>
+        <option value="nome">Nome</option>
+        <option value="cpf">CPF</option>
+        <option value="email">Email</option>
+    </select><br><br>
+
+    <label for="valor">Novo valor:</label><br>
+    <input type="text" name="valor" id="valor" required><br><br>
+
+    <button type="submit">Salvar Alterações</button>
+</form>
+
+<footer class="menu-footer" style="margin-top: 100px;">
+    <a href="{{ url_for('voltar_menup') }}" class="btn">Voltar para o menu</a>
+</footer>
+{% endblock %}
