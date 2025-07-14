@@ -343,24 +343,25 @@ def cancelar_consulta_post():
 
 @app.route("/visualizar_medicos", methods=["GET", "POST"])
 def visualizar_medicos():
-    medicos = carregar_medicos()
+    especialidades = carregar_especialidades()  # ✅ carregue primeiro
+    medicos = carregar_medicos(especialidades)  # ✅ passe como argumento
 
-    # Obter todas as especialidades únicas
-    especialidades = sorted(set(m['especialidade']['nome'] for m in medicos))  # ✅ certo
-
+    # Obter todas as especialidades únicas (strings) para o dropdown
+    nomes_especialidades = sorted(set(e.nome for e in especialidades))
 
     especialidade_selecionada = request.form.get("especialidade")
-    if especialidade_selecionada:
-        medicos_filtrados = [m for m in medicos if m['especialidade']['nome'] == especialidade_selecionada]
 
+    if especialidade_selecionada:
+        medicos_filtrados = [m for m in medicos if m.especialidade.nome == especialidade_selecionada]
     else:
         medicos_filtrados = []
 
-    return render_template("visualizar_medicos.html",
-                           especialidades=especialidades,
-                           medicos=medicos_filtrados,
-                           selecionada=especialidade_selecionada)
-
+    return render_template(
+        "visualizar_medicos.html",
+        especialidades=nomes_especialidades,
+        medicos=medicos_filtrados,
+        selecionada=especialidade_selecionada
+    )
 
 @app.route("/pagamento", methods=["GET", "POST"])
 def pagamento():
@@ -409,7 +410,7 @@ def pagamento():
     return render_template("pagamento.html", consultas=consultas_paciente)
 
 @app.route('/cancelar_consultamed', methods=['GET'])
-def cancelar_medconsulta():
+def cancelar_consultamed():
     if 'email' not in session or session.get('tipo') != 'medico':
         return redirect(url_for('login'))
 
@@ -417,7 +418,7 @@ def cancelar_medconsulta():
     
     if not medico_logado:
         flash("Médico não encontrado.", "error")
-        return redirect(url_for('login'))
+        return redirect(url_for('menu_medico'))
 
     consultas_do_medico = [
         c for c in consultas
@@ -480,6 +481,20 @@ def cancelar_medconsulta_post():
         flash("Seleção de consulta inválida ou consulta não encontrada.", "error")
 
     return redirect(url_for('cancelar_consultamed'))
+
+@app.route('/visualizar_pacientes')
+def visualizar_pacientes():
+    if 'email' not in session or session.get('tipo') != 'medico':
+        return redirect(url_for('menu_medico'))
+    
+    medico = next((m for m in medicos if m.email == session['email']), None)
+    if not medico:
+        flash("Médico não encontrado.")
+        return redirect(url_for('menu_medico'))
+    
+    # Filtra as consultas para o médico logado
+    consultas_med = [c for c in consultas if c.medico and c.medico.email == medico.email]
+    return render_template('visualizar_pacientes.html', consultas=consultas_med, nome=medico.nome)
 
 
 if __name__ == '__main__':

@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Consultas do Médico: Dr(a). {{ nome }}</h2>
+<h2>Pacientes: Dr(a). {{ nome }}</h2>
 
 {% if consultas %}
   <ul>
     {% for consulta in consultas %}
-      <li>{{ consulta.data_hora }} - Paciente: {{ consulta.paciente.nome }} ({{ consulta.status }})</li>
+      <li>Paciente: {{ consulta.paciente.nome }}</li>
     {% endfor %}
   </ul>
 {% else %}
-  <p>Esse médico não tem consultas agendadas.</p>
+  <p>Esse médico não tem pacientes agendados.</p>
 {% endif %}
 
 <footer class="menu-footer" style="margin-top: 100px;">
