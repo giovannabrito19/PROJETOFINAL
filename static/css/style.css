@@ -149,3 +149,13 @@ body {
   text-decoration: underline;
   font-weight: bold;
 }
+
+.menu-grid-centralizado {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.menu-card--perfil {
+  width: 250px;
+}

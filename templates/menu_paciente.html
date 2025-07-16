@@ -1,11 +1,33 @@
 {% extends "base.html" %}
 {% block content %}
+
+<style>
+  .menu-grid-centralizado {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .menu-card--perfil {
+    width: 250px;
+  }
+</style>
+
 <div class="menu-container">
   <header class="menu-header">
     <h1>Painel da Clínica</h1>
     <p>Escolha uma das opções abaixo:</p>
   </header>
 
+  <!-- PERFIL CENTRALIZADO -->
+  <div class="menu-grid-centralizado">
+    <a href="{{ url_for('editar_perfil_paciente') }}" class="menu-card menu-card--perfil">
+      <h3>Perfil</h3>
+      <p>Editar dados do Perfil.</p>
+    </a>
+  </div>
+
+  <!-- OUTRAS OPÇÕES EM GRID -->
   <div class="menu-grid">
     <a href="{{ url_for('marcar_consulta') }}" class="menu-card">
       <h3>Agendar Consulta</h3>
@@ -23,13 +45,9 @@
       <h3>Visualizar Consultas</h3>
       <p>Acompanhe os agendamentos realizados.</p>
     </a>
-    <a href="{{ url_for('pagamento')}}" class="menu-card">
+    <a href="{{ url_for('pagamento') }}" class="menu-card">
       <h3>Realizar Pagamento</h3>
       <p>Efetue o pagamento de uma consulta.</p>
-    </a>
-    <a href="{{ url_for('editar_perfil_paciente')}}" class="menu-card">
-      <h3>Perfil</h3>
-      <p>Editar dados do Perfil.</p>
     </a>
   </div>
 
@@ -37,4 +55,5 @@
     <a href="{{ url_for('logout') }}">Sair</a>
   </footer>
 </div>
+
 {% endblock %}
